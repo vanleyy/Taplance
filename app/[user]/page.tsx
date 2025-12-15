@@ -32,7 +32,6 @@ export default function ProfilePage() {
     if (data) {
       const links = data.links as Links;
       const flattened = flattenLinks(links, iconMap);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDynamicSocialLinks(flattened);
     }
   }, [data]);
@@ -60,11 +59,13 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="w-full flex justify-center items-center">
-      <div className="w-1/4 flex flex-col items-center pt-20 px-6">
+    <div className="w-full flex justify-center items-start sm:items-center px-4 sm:px-6 lg:px-28 pt-10 sm:pt-20 pb-10">
+      <div className="w-full sm:w-4/5 lg:w-2/3 xl:w-1/2 flex flex-col items-center">
+        {/* Profile Header */}
         <ProfileHeader data={data} />
 
-        <div className="w-full mt-10 flex flex-col gap-4">
+        {/* Links */}
+        <div className="w-full mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
           {dynamicSocialLinks.length > 0 ? (
             dynamicSocialLinks.map((item) => (
               <LinkButton
@@ -75,7 +76,7 @@ export default function ProfilePage() {
               />
             ))
           ) : (
-            <div className="w-full p-6 rounded-lg text-center text-gray-500 dark:text-gray-300 flex flex-col items-center gap-2">
+            <div className="w-full p-6 rounded-lg text-center text-gray-500 dark:text-gray-300 flex flex-col items-center gap-2 col-span-full">
               <LinkIcon
                 size={26}
                 className="text-gray-400 dark:text-gray-400"
