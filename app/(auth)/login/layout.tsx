@@ -12,8 +12,6 @@ const LoginLayout = async ({
     data: { user },
   } = await (await supabase).auth.getUser();
 
-  console.log("user", user);
-
   // ✅ Redirect logged-in users to dashboard
   if (user) {
     redirect("/dashboard");

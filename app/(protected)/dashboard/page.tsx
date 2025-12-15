@@ -12,6 +12,7 @@ import {
   useQuery,
   useUpdateMutation,
 } from "@supabase-cache-helpers/postgrest-swr";
+import imageCompression from "browser-image-compression";
 import {
   Form,
   FormField,
@@ -124,13 +125,30 @@ const DashboardPage = () => {
     let avatarUrl = data?.avatar;
 
     if (selectedAvatar) {
-      const fileExt = selectedAvatar.name.split(".").pop();
-      const fileName = `${data?.id}.${fileExt}`;
+      if (selectedAvatar.size > 5 * 1024 * 1024) {
+        return toast.error("Image too large");
+      }
+      // ✅ compress & resize before upload
+      const compressedAvatar = await imageCompression(selectedAvatar, {
+        maxSizeMB: 0.3, // ~300KB
+        maxWidthOrHeight: 1024, // resize
+        useWebWorker: true,
+        fileType: "image/webp", // convert to webp
+      });
+
+      const fileName = `${data?.id}.webp`;
+
       const { data: uploadData, error } = await supabase.storage
         .from("public-avatars")
-        .upload(fileName, selectedAvatar, { upsert: true });
+        .upload(fileName, compressedAvatar, {
+          upsert: true,
+          contentType: "image/webp",
+        });
 
-      if (error) return toast.error("Failed to upload avatar");
+      if (error) {
+        toast.error("Failed to upload avatar");
+        return;
+      }
 
       avatarUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-avatars/${uploadData.path}`;
     }
@@ -166,8 +184,11 @@ const DashboardPage = () => {
           miscellaneous: cleanedValues.miscellaneous,
         },
       });
-    } catch {}
+    } catch {
+      toast.error("Profile update failed");
+    }
   }
+
   const onError = () => toast.error("Please fix the highlighted fields.");
 
   return (

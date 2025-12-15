@@ -9,7 +9,7 @@ const Login = () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `https://taplance.vercel.app/auth/callback`,
+        redirectTo: `http://localhost:3000/auth/callback`,
       },
     });
   };

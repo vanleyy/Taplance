@@ -39,8 +39,6 @@ export default function ProtectedLayout({
           setUserId(session.user.id);
         }
       });
-
-      console.log("test", typeof authListener);
     };
 
     getUser();
