@@ -1,4 +1,3 @@
-"use client"; // important: mark this as client component
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -15,6 +14,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const metadata: Metadata = {
+  title: {
+    default: "Taplance",
+    template: "%s | Taplance",
+  },
+  description: "Your profile & links platform",
+};
 export default function RootLayout({
   children,
 }: {
