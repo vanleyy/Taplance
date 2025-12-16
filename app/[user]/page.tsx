@@ -31,9 +31,11 @@ export default function ProfilePage() {
   useEffect(() => {
     if (data) {
       const links = data.links as Links;
-      const flattened = flattenLinks(links, iconMap);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDynamicSocialLinks(flattened);
+      if (links) {
+        const flattened = flattenLinks(links, iconMap);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setDynamicSocialLinks(flattened);
+      }
     }
   }, [data]);
 
