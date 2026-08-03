@@ -1,30 +1,15 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { LinkField } from "./link-field";
 
 export default function MiscInputs() {
-  const form = useFormContext();
-
   return (
     <div className="flex flex-col gap-6 my-3">
-      <FormField
-        control={form.control}
+      <LinkField
         name="miscellaneous.custom"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="font-light">Custom Link</FormLabel>
-            <FormControl>
-              <Input placeholder="Any custom link..." {...field} />
-            </FormControl>
-          </FormItem>
-        )}
+        label="Custom Link"
+        kind="url"
+        placeholder="Any custom link..."
       />
     </div>
   );

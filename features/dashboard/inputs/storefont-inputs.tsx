@@ -1,54 +1,24 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-} from "@/components/ui/form";
-import { HandleInput } from "./handle-input";
+import { LinkField } from "./link-field";
 
 export default function StorefrontInputs() {
-  const form = useFormContext();
-
   return (
     <div className="flex flex-col gap-6 my-3">
-      <FormField
-        control={form.control}
+      <LinkField
         name="storefront.shopify"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="font-light">Shopify Store</FormLabel>
-            <FormControl>
-              <HandleInput
-                placeholder="your-store"
-                baseDomain="myshopify.com"
-                handleIsSubdomain
-                suffix=".myshopify.com"
-                {...field}
-              />
-            </FormControl>
-          </FormItem>
-        )}
+        label="Shopify Store"
+        baseDomain="myshopify.com"
+        handleIsSubdomain
+        suffix=".myshopify.com"
+        placeholder="your-store"
       />
-
-      <FormField
-        control={form.control}
+      <LinkField
         name="storefront.etsy"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="font-light">Etsy Store</FormLabel>
-            <FormControl>
-              <HandleInput
-                placeholder="your-shop-name"
-                baseDomain="etsy.com"
-                prefix="etsy.com/shop/"
-                {...field}
-              />
-            </FormControl>
-          </FormItem>
-        )}
+        label="Etsy Store"
+        baseDomain="etsy.com"
+        prefix="etsy.com/shop/"
+        placeholder="your-shop-name"
       />
     </div>
   );
