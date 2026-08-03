@@ -30,8 +30,13 @@ const NavBar = ({ userAuthenticated }: NavBarProps) => {
   const [open, setOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const handleLogout = async () => {
+    try {
+      // Invalidate the session server-side so the auth cookies are cleared.
+      await fetch("/auth/signout", { method: "POST" });
+    } catch {
+      // Fall through — the client signOut below still clears local state.
+    }
     await supabase.auth.signOut();
-    router.push("/login");
   };
 
   return (

@@ -8,6 +8,7 @@ import {
   FormControl,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { HandleInput } from "./handle-input";
 
 export default function ProfessionalInputs() {
   const form = useFormContext();
@@ -21,8 +22,10 @@ export default function ProfessionalInputs() {
           <FormItem>
             <FormLabel className="font-light">LinkedIn</FormLabel>
             <FormControl>
-              <Input
-                placeholder="https://www.linkedin.com/in/..../"
+              <HandleInput
+                placeholder="username"
+                baseDomain="linkedin.com"
+                prefix="linkedin.com/in/"
                 {...field}
               />
             </FormControl>

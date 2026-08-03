@@ -7,7 +7,7 @@ import {
   FormLabel,
   FormControl,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { HandleInput } from "./handle-input";
 
 export default function StorefrontInputs() {
   const form = useFormContext();
@@ -21,7 +21,13 @@ export default function StorefrontInputs() {
           <FormItem>
             <FormLabel className="font-light">Shopify Store</FormLabel>
             <FormControl>
-              <Input placeholder="https://yourshop.shopify.com" {...field} />
+              <HandleInput
+                placeholder="your-store"
+                baseDomain="myshopify.com"
+                handleIsSubdomain
+                suffix=".myshopify.com"
+                {...field}
+              />
             </FormControl>
           </FormItem>
         )}
@@ -34,7 +40,12 @@ export default function StorefrontInputs() {
           <FormItem>
             <FormLabel className="font-light">Etsy Store</FormLabel>
             <FormControl>
-              <Input placeholder="https://www.etsy.com/shop/..." {...field} />
+              <HandleInput
+                placeholder="your-shop-name"
+                baseDomain="etsy.com"
+                prefix="etsy.com/shop/"
+                {...field}
+              />
             </FormControl>
           </FormItem>
         )}

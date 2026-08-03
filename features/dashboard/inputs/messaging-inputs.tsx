@@ -8,6 +8,7 @@ import {
   FormControl,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { HandleInput } from "./handle-input";
 
 export default function MessagingInputs() {
   const form = useFormContext();
@@ -21,7 +22,17 @@ export default function MessagingInputs() {
           <FormItem>
             <FormLabel className="font-light">WhatsApp</FormLabel>
             <FormControl>
-              <Input placeholder="+213..." {...field} />
+              <Input
+                placeholder="+213..."
+                {...field}
+                onChange={(e) => {
+                  // Only digits and one leading "+" — strips pasted spaces/dashes.
+                  const raw = e.target.value.replace(/[^\d+]/g, "");
+                  const plus = raw.startsWith("+") ? "+" : "";
+                  e.target.value = plus + raw.replace(/\+/g, "");
+                  field.onChange(e);
+                }}
+              />
             </FormControl>
           </FormItem>
         )}
@@ -34,7 +45,12 @@ export default function MessagingInputs() {
           <FormItem>
             <FormLabel className="font-light">Telegram</FormLabel>
             <FormControl>
-              <Input placeholder="https://telegram.me/username" {...field} />
+              <HandleInput
+                placeholder="username"
+                baseDomain="t.me"
+                prefix="t.me/"
+                {...field}
+              />
             </FormControl>
           </FormItem>
         )}

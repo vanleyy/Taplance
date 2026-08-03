@@ -7,7 +7,7 @@ import {
   FormLabel,
   FormControl,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { HandleInput } from "./handle-input";
 
 export default function CreativeInputs() {
   const form = useFormContext();
@@ -21,7 +21,12 @@ export default function CreativeInputs() {
           <FormItem>
             <FormLabel className="font-light">Behance</FormLabel>
             <FormControl>
-              <Input placeholder="https://www.behance.net/..." {...field} />
+              <HandleInput
+                placeholder="username"
+                baseDomain="behance.net"
+                prefix="behance.net/"
+                {...field}
+              />
             </FormControl>
           </FormItem>
         )}
@@ -34,7 +39,12 @@ export default function CreativeInputs() {
           <FormItem>
             <FormLabel className="font-light">Dribbble</FormLabel>
             <FormControl>
-              <Input placeholder="https://www.dribbble.com/..." {...field} />
+              <HandleInput
+                placeholder="username"
+                baseDomain="dribbble.com"
+                prefix="dribbble.com/"
+                {...field}
+              />
             </FormControl>
           </FormItem>
         )}

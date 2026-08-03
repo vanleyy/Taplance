@@ -1,3 +1,5 @@
+"use client";
+
 import { useFormContext } from "react-hook-form";
 import {
   FormField,
@@ -5,7 +7,7 @@ import {
   FormLabel,
   FormControl,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { HandleInput } from "./handle-input";
 
 export default function SocialInputs() {
   const form = useFormContext();
@@ -19,8 +21,10 @@ export default function SocialInputs() {
           <FormItem>
             <FormLabel className="font-light">Instagram</FormLabel>
             <FormControl>
-              <Input
-                placeholder="https://www.instagram.com/username"
+              <HandleInput
+                placeholder="username"
+                baseDomain="instagram.com"
+                prefix="instagram.com/"
                 {...field}
               />
             </FormControl>
@@ -33,9 +37,14 @@ export default function SocialInputs() {
         name="social.twitter"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="font-light">Twitter</FormLabel>
+            <FormLabel className="font-light">Twitter / X</FormLabel>
             <FormControl>
-              <Input placeholder="https://www.x.com/username" {...field} />
+              <HandleInput
+                placeholder="username"
+                baseDomain="x.com"
+                prefix="x.com/"
+                {...field}
+              />
             </FormControl>
           </FormItem>
         )}

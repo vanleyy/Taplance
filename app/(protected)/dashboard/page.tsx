@@ -6,7 +6,7 @@ import {
 } from "@/lib/validators/user-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FieldErrors } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import {
   useQuery,
@@ -33,6 +33,8 @@ import { getUserProfile } from "@/lib/queries/users";
 import { TabsTriggers } from "@/features/dashboard/tabs-triggers";
 import { TabsContents } from "@/features/dashboard/tabs-content";
 import Link from "next/link";
+import { deepMerge, pickDirtyValues } from "@/lib/helpers/dirty-fields";
+import { sanitizeUsername } from "@/features/dashboard/inputs/handle-input";
 
 type Links = {
   social: { instagram: string; twitter: string };
@@ -101,16 +103,29 @@ const DashboardPage = () => {
     });
   }
 
-  useEffect(() => {
-    const links = data?.links as Links;
-    if (data) {
-      form.setValue("fullname", data?.fullname);
-      form.setValue("username", data?.username);
-      form.setValue("avatar", data?.avatar);
-      form.setValue("about", data.about ?? "");
-      if (links) setNestedFormValues(form, "", links);
-    }
-  }, [data]);
+useEffect(() => {
+  if (!data) return;
+
+  // Merge stored links over the empty defaults so a partial/legacy "links"
+  // row never drops a group (which would make zod reject the form on submit).
+  const emptyLinks: Links = {
+    social: { instagram: "", twitter: "" },
+    professional: { linkedin: "", portfolio: "" },
+    creative: { behance: "", dribbble: "" },
+    messaging: { whatsapp: "", telegram: "" },
+    storefront: { shopify: "", etsy: "" },
+    miscellaneous: { custom: "" },
+  };
+  const links = deepMerge(emptyLinks, data.links ?? {});
+
+  form.reset({
+    fullname: data.fullname ?? "",
+    username: data.username ?? "",
+    avatar: data.avatar ?? "",
+    about: data.about ?? "",
+    ...links,
+  });
+}, [data]);
 
   async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -121,75 +136,87 @@ const DashboardPage = () => {
     form.setValue("avatar", previewUrl);
   }
 
-  async function onSubmit(values: ProfileDetailsType) {
-    let avatarUrl = data?.avatar;
+async function onSubmit(values: ProfileDetailsType) {
+  const dirtyFields = form.formState.dirtyFields;
 
-    if (selectedAvatar) {
-      if (selectedAvatar.size > 5 * 1024 * 1024) {
-        return toast.error("Image too large");
-      }
-      // ✅ compress & resize before upload
-      const compressedAvatar = await imageCompression(selectedAvatar, {
-        maxSizeMB: 0.3, // ~300KB
-        maxWidthOrHeight: 1024, // resize
-        useWebWorker: true,
-        fileType: "image/webp", // convert to webp
+  let avatarUrl: string | undefined;
+  const avatarChanged = Boolean(selectedAvatar);
+
+  if (selectedAvatar) {
+    if (selectedAvatar.size > 5 * 1024 * 1024) {
+      return toast.error("Image too large");
+    }
+    const compressedAvatar = await imageCompression(selectedAvatar, {
+      maxSizeMB: 0.3,
+      maxWidthOrHeight: 1024,
+      useWebWorker: true,
+      fileType: "image/webp",
+    });
+
+    const fileName = `${data?.id}.webp`;
+    const { data: uploadData, error } = await supabase.storage
+      .from("public-avatars")
+      .upload(fileName, compressedAvatar, {
+        upsert: true,
+        contentType: "image/webp",
       });
 
-      const fileName = `${data?.id}.webp`;
-
-      const { data: uploadData, error } = await supabase.storage
-        .from("public-avatars")
-        .upload(fileName, compressedAvatar, {
-          upsert: true,
-          contentType: "image/webp",
-        });
-
-      if (error) {
-        toast.error("Failed to upload avatar");
-        return;
-      }
-
-      avatarUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-avatars/${uploadData.path}`;
+    if (error) {
+      toast.error("Failed to upload avatar");
+      return;
     }
 
-    // sanitize null values
-    const cleanedValues = nullToEmpty(values);
-    function nullToEmpty(obj: any): any {
-      if (obj === null) return "";
-      if (Array.isArray(obj)) return obj.map(nullToEmpty);
-      if (typeof obj === "object") {
-        const res: any = {};
-        for (const key in obj) {
-          res[key] = nullToEmpty(obj[key]);
-        }
-        return res;
-      }
-      return obj;
-    }
-
-    try {
-      await update({
-        id: data?.id,
-        fullname: cleanedValues.fullname,
-        username: cleanedValues.username,
-        about: cleanedValues.about,
-        avatar: avatarUrl,
-        links: {
-          social: cleanedValues.social,
-          professional: cleanedValues.professional,
-          creative: cleanedValues.creative,
-          messaging: cleanedValues.messaging,
-          storefront: cleanedValues.storefront,
-          miscellaneous: cleanedValues.miscellaneous,
-        },
-      });
-    } catch {
-      toast.error("Profile update failed");
-    }
+    avatarUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-avatars/${uploadData.path}`;
   }
 
-  const onError = () => toast.error("Please fix the highlighted fields.");
+  // Only pull out fields that actually changed
+  const dirtyValues = pickDirtyValues(dirtyFields, values) ?? {};
+
+  const nullToEmpty = (obj: any): any => {
+    if (obj === null) return "";
+    if (Array.isArray(obj)) return obj.map(nullToEmpty);
+    if (typeof obj === "object") {
+      const res: any = {};
+      for (const key in obj) res[key] = nullToEmpty(obj[key]);
+      return res;
+    }
+    return obj;
+  };
+  const cleanedDirty = nullToEmpty(dirtyValues);
+
+  const { fullname, username, about, avatar, ...dirtyLinkGroups } = cleanedDirty;
+
+  const hasDirtyLinks = Object.keys(dirtyLinkGroups).length > 0;
+
+  const payload: Record<string, any> = { id: data?.id };
+  if (fullname !== undefined) payload.fullname = fullname;
+  if (username !== undefined) payload.username = username;
+  if (about !== undefined) payload.about = about;
+  if (avatarChanged) payload.avatar = avatarUrl;
+  else if (avatar !== undefined) payload.avatar = avatar;
+
+  if (hasDirtyLinks) {
+    payload.links = deepMerge(data?.links ?? {}, dirtyLinkGroups);
+  }
+
+  // Nothing to save
+  if (Object.keys(payload).length === 1 && !avatarChanged) {
+    toast.message("No changes to save");
+    return;
+  }
+
+  try {
+    await update(payload);
+    // Re-baseline so subsequent edits are compared against what we just saved
+    form.reset(values, { keepValues: true, keepDirty: false });
+  } catch {
+    toast.error("Profile update failed");
+  }
+}
+
+  const onError = (error: FieldErrors<ProfileDetailsType>) => {
+    console.log(error)
+    toast.error("Please fix the highlighted fields.");}
 
   return (
     <div className="flex flex-col justify-center items-center gap-5 px-4 sm:px-6 lg:mx-28 mb-10">
@@ -244,7 +271,16 @@ const DashboardPage = () => {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="username" {...field} />
+                    <Input
+                      placeholder="username"
+                      {...field}
+                      onChange={(e) => {
+                        // Only letters/numbers — the username is part of the
+                        // public URL path (/{username}).
+                        e.target.value = sanitizeUsername(e.target.value);
+                        field.onChange(e);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

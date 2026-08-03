@@ -33,7 +33,7 @@ export default function ProtectedLayout({
       // Listen to auth state changes
       authListener = supabase.auth.onAuthStateChange((_event, session) => {
         if (!session?.user) {
-          router.replace("/login");
+          router.replace("/");
         } else {
           setUserId(session.user.id);
         }
