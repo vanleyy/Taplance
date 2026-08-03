@@ -6,11 +6,11 @@ const LoginLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
-  } = await (await supabase).auth.getUser();
+  } = await supabase.auth.getUser();
 
   // ✅ Redirect logged-in users to dashboard
   if (user) {

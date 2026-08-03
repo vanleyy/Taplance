@@ -2,16 +2,21 @@
 import { Button } from "@/components/ui/button";
 import Google from "@/public/Google";
 import { createClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 
 const Login = () => {
   const supabase = createClient();
   const signIn = async () => {
-    await supabase.auth.signInWithOAuth({
+    // Use the current origin so sign-in works on localhost, previews and prod.
+    // Each origin must be listed in Supabase's redirect URL allowlist.
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `https://taplance.vercel.app/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
+
+    if (error) toast.error("Could not sign in with Google. Please try again.");
   };
   return (
     <div className="flex h-screen justify-center items-center">

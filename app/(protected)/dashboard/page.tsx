@@ -199,8 +199,13 @@ const DashboardPage = () => {
             <h4 className="font-bold">
               Congrats {data.username}! your page is ready!
             </h4>
-            <Link className="underline text-xs" href="/hackedsdq">
-              https://taplance.vercel.app/{data.username}
+            <Link
+              className="underline text-xs"
+              href={data.username ? `/${data.username}` : "#"}
+            >
+              {typeof window !== "undefined"
+                ? `${window.location.origin}/${data.username}`
+                : `/${data.username}`}
             </Link>
           </div>
         )}

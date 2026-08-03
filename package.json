@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gentypes": "npx supabase gen types typescript --project-id 'ilodslsrfhrsgefodtbv' --schema public > types_db.ts"
+    "gentypes": "npx supabase gen types typescript --project-id \"$(echo $NEXT_PUBLIC_SUPABASE_URL | sed -E 's#https://([^.]+)\\..*#\\1#')\" --schema public > types_db.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

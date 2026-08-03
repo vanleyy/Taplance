@@ -35,7 +35,7 @@ export default function SocialInputs() {
           <FormItem>
             <FormLabel className="font-light">Twitter</FormLabel>
             <FormControl>
-              <Input placeholder="ttps://www.x.com/username" {...field} />
+              <Input placeholder="https://www.x.com/username" {...field} />
             </FormControl>
           </FormItem>
         )}

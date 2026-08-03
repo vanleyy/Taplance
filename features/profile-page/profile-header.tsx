@@ -34,7 +34,7 @@ export default function ProfileHeader({ data }: ProfileHeaderProps) {
         </span>
       </h1>
 
-      <p className="mt-2 text-center text-blue-400-600 w-[350px]">
+      <p className="mt-2 text-center text-blue-600 w-[350px]">
         {data.about}
       </p>
     </div>

@@ -4,12 +4,11 @@ import ProfileHeader from "@/features/profile-page/profile-header";
 import LinkButton from "@/features/profile-page/profile-links";
 import { getPublicUserProfile } from "@/lib/queries/users";
 import { useQuery } from "@supabase-cache-helpers/postgrest-swr";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { iconMap } from "@/lib/constants/icon-map";
 import { flattenLinks } from "@/lib/helpers/flatten-links";
 import { AlertCircle, Link as LinkIcon, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { JSX } from "react";
 
 type Links = {
   social: { instagram: string; twitter: string };
@@ -21,26 +20,22 @@ type Links = {
 };
 
 export default function ProfilePage() {
-  const { user } = useParams() as { user: string };
-  const [dynamicSocialLinks, setDynamicSocialLinks] = useState<
-    { label: string; icon: JSX.Element; url: string }[]
-  >([]);
+  const params = useParams() as { user: string };
+  // Route params arrive percent-encoded; the stored username is not.
+  const user = decodeURIComponent(params.user);
 
-  const { data, error, isValidating } = useQuery(getPublicUserProfile(user));
+  const { data, error, isLoading } = useQuery(getPublicUserProfile(user));
 
-  useEffect(() => {
-    if (data) {
-      const links = data.links as Links;
-      if (links) {
-        const flattened = flattenLinks(links, iconMap);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setDynamicSocialLinks(flattened);
-      }
-    }
+  // Derive links from data instead of mirroring them into state, so removing
+  // every link actually empties the list.
+  const dynamicSocialLinks = useMemo(() => {
+    const links = data?.links as Links | null | undefined;
+    return links ? flattenLinks(links, iconMap) : [];
   }, [data]);
 
-  // Loading state
-  if (isValidating) {
+  // Loading state — isLoading is only true when there is no cached data yet,
+  // unlike isValidating which is also true on every background revalidation.
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen relative top-1/3">
         <Loader2 className="w-10 h-10 animate-spin text-gray-500" />

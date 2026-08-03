@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const Hero = () => {
+  // Username of the profile shown by the "Preview" button. Override per
+  // environment (e.g. a seeded demo user) via NEXT_PUBLIC_DEMO_USERNAME.
+  const demoUsername = process.env.NEXT_PUBLIC_DEMO_USERNAME ?? "hackedsdq";
   return (
     <section className="w-full px-4 sm:px-6 lg:px-28 pt-20 pb-24">
       <div className="flex flex-col items-center gap-8 text-center">
@@ -51,7 +54,7 @@ const Hero = () => {
           </Link>
 
           <Button variant="outline" className="w-full sm:w-auto">
-            <Link href="/hackedsdq">Preview</Link>
+            <Link href={`/${demoUsername}`}>Preview</Link>
             <ArrowRight className="-rotate-45" size={12} />
           </Button>
         </div>
