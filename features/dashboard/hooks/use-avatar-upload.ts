@@ -55,7 +55,10 @@ export function useAvatarUpload(onPreview: (previewUrl: string) => void) {
       throw new Error("Failed to upload avatar");
     }
 
-    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-avatars/${uploadData.path}`;
+    // Cache-busting query param: the object path is fixed per profile, so the
+    // URL would otherwise never change and browsers/CDNs would keep serving the
+    // stale image after a re-upload. A fresh URL on every upload forces a refetch.
+    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-avatars/${uploadData.path}?v=${Date.now()}`;
   }, [selectedAvatar]);
 
   return { selectedAvatar, onAvatarChange, uploadAvatar };
