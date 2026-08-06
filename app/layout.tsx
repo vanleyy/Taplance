@@ -20,6 +20,10 @@ export const metadata: Metadata = {
     template: "%s | Taplance",
   },
   description: "Your profile & links platform",
+  icons: {
+    icon: "/logo.svg",
+    apple: "/logo.svg",
+  },
 };
 export default function RootLayout({
   children,
