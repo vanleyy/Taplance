@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { CornerRightDown, Moon, PartyPopper, Sun } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
 
 import {
   AlertDialog,
@@ -26,7 +25,6 @@ interface NavBarProps {
 
 const NavBar = ({ userAuthenticated }: NavBarProps) => {
   const supabase = createClient();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const handleLogout = async () => {
@@ -42,10 +40,12 @@ const NavBar = ({ userAuthenticated }: NavBarProps) => {
   return (
     <nav className="flex w-full justify-between px-2 sm:px-6 lg:px-28 h-20 items-center">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="scroll-m-20 text-center text-xl font-bold tracking-tight text-balance">
-          Taplance
-        </h1>
-        <PartyPopper size={15} />
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <h1 className="scroll-m-20 text-center text-xl font-bold tracking-tight text-balance">
+            Taplance
+          </h1>
+          <PartyPopper size={15} />
+        </Link>
       </div>
 
       <div className="flex justify-center gap-2">

@@ -1,7 +1,7 @@
 "use client";
 
 import ProfileHeader from "@/features/profile-page/profile-header";
-import LinkButton from "@/features/profile-page/profile-links";
+import LinkCard from "@/features/profile-page/profile-links";
 import { getPublicUserProfile } from "@/lib/queries/users";
 import { useQuery } from "@supabase-cache-helpers/postgrest-swr";
 import { useMemo } from "react";
@@ -63,10 +63,10 @@ export default function ProfilePage() {
         <ProfileHeader data={data} />
 
         {/* Links */}
-        <div className="w-full mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="w-full mt-10 flex flex-col gap-3">
           {dynamicSocialLinks.length > 0 ? (
             dynamicSocialLinks.map((item) => (
-              <LinkButton
+              <LinkCard
                 key={item.label}
                 icon={item.icon}
                 label={item.label}
@@ -74,7 +74,7 @@ export default function ProfilePage() {
               />
             ))
           ) : (
-            <div className="w-full p-6 rounded-lg text-center text-gray-500 dark:text-gray-300 flex flex-col items-center gap-2 col-span-full">
+            <div className="w-full p-6 rounded-lg text-center text-gray-500 dark:text-gray-300 flex flex-col items-center gap-2">
               <LinkIcon
                 size={26}
                 className="text-gray-400 dark:text-gray-400"

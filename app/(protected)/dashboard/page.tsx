@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import { useForm, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useUpdateMutation } from "@supabase-cache-helpers/postgrest-swr";
@@ -21,6 +20,7 @@ import { buildProfileUpdate, deepMerge } from "@/lib/helpers/dirty-fields";
 import { TabsTriggers } from "@/features/dashboard/tabs-triggers";
 import { TabsContents } from "@/features/dashboard/tabs-content";
 import { BasicFields } from "@/features/dashboard/basic-fields";
+import { PageReadyBanner } from "@/features/dashboard/page-ready-banner";
 import { useAvatarUpload } from "@/features/dashboard/hooks/use-avatar-upload";
 
 type Links = {
@@ -172,21 +172,7 @@ const DashboardPage = () => {
   return (
     <div className="flex flex-col justify-center items-center gap-5 px-4 sm:px-6 lg:mx-28 mb-10">
       <div className="flex justify-center items-center w-full">
-        {data?.username && (
-          <div className="w-full rounded px-4 sm:px-5 outline py-2">
-            <h4 className="font-bold">
-              Congrats {data.username}! your page is ready!
-            </h4>
-            <Link
-              className="underline text-xs"
-              href={data.username ? `/${data.username}` : "#"}
-            >
-              {typeof window !== "undefined"
-                ? `${window.location.origin}/${data.username}`
-                : `/${data.username}`}
-            </Link>
-          </div>
-        )}
+        {data?.username && <PageReadyBanner username={data.username} />}
       </div>
 
       <div className="w-full sm:w-4/5 lg:w-2/3">
