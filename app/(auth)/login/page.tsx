@@ -19,24 +19,29 @@ const Login = () => {
     if (error) toast.error("Could not sign in with Google. Please try again.");
   };
   return (
-    <div className="flex h-screen justify-center items-center">
-      <div className="flex flex-col justify-center items-center gap-5 text-center bg-secondary p-4 md:w-1/4  h-48 rounded-xl">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-8">
+      {/* Background */}
+      <div className="absolute inset-0 -z-10 h-full w-full [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]" />
+
+      <div className="w-full max-w-sm rounded-xl bg-secondary p-6 sm:p-8 shadow-lg flex flex-col items-center gap-6 text-center">
         <div>
-          <p className="croll-m-20 text-xl font-semibold tracking-tight">
+          <p className="text-2xl font-semibold tracking-tight">
             Sign in to Taplance
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Welcome back! Please sign in to continue
           </p>
         </div>
 
-        <Button onClick={signIn} variant={"outline"} className="cursor-pointer">
-          <p>Continue with google</p>
-          <Google />
+        <Button
+          onClick={signIn}
+          variant="outline"
+          className="w-full h-11 cursor-pointer"
+        >
+          Continue with Google
+          <Google className="size-4" />
         </Button>
       </div>
-
-      <div className="absolute inset-0 -z-10 h-full w-full items-center px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]"></div>
     </div>
   );
 };
